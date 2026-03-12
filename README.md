@@ -42,3 +42,13 @@ Excel (raw data) → n8n (ETL) → PostgreSQL (storage) → Quadratic (analysis)
 4. Open Quadratic and connect to ott_market_db
 5. Open Power BI and connect to PostgreSQL or import CSV exports
 
+
+
+## Screenshots
+
+<img width="1901" height="715" alt="image" src="https://github.com/user-attachments/assets/2772bf7d-e492-42db-92ec-fd279f896c4f" />
+<img width="1916" height="917" alt="image" src="https://github.com/user-attachments/assets/a09bee36-a7db-4c26-ab85-7e04519fb57a" />
+<img width="1919" height="945" alt="image" src="https://github.com/user-attachments/assets/d5dfe0f4-307d-4a7d-8942-cef9facc0f84" />
+
+
+
