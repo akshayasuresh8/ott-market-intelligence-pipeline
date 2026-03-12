@@ -1,0 +1,240 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e50485da-5253-4b19-a284-4e064b0b6a2b",
+      "name": "Start Pipeline",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "sheetName": " raw_subscribers"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "ace6c002-0bbe-477b-8b8a-cc0a4dbdb04d",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cleaned = [];\n\nfor (const item of $input.all()) {\n  const row = item.json;\n\n  // Skip header rows and empty rows\n  if (!row.PlatformID || row.PlatformID === 'PlatformID') continue;\n\n  // Skip flagged data quality rows\n  if (row.Data_Quality === 'FLAG') continue;\n\n  cleaned.push({\n    json: {\n      platform_id:    String(row.PlatformID || '').trim(),\n      region:         String(row.Region || '').trim(),\n      year:           parseInt(row.Year) || null,\n      quarter:        parseInt(row.Quater) || null,\n      subscribers_m:  parseFloat(row.Subscribers_M) || null,\n      source:         String(row.Source || 'Manual').trim()\n    }\n  });\n}\n\nreturn cleaned;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "d2757dfc-c528-43bb-bdd4-f68d88c47981",
+      "name": "Clean and Transform1"
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:\\Users\\avadh\\.n8n-files\\ott_market_staging.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6cf35ce7-60ef-46d7-a58a-f861380aa2b4",
+      "name": "clean and transform"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "subscribers",
+          "mode": "list",
+          "cachedResultName": "subscribers"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "year": "={{ $json.year }}",
+            "quarter": "={{ $json.quarter }}",
+            "subscribers_m": "={{ $json.subscribers_m }}",
+            "platform_id": "={{ $json.platform_id }}",
+            "region": "={{ $json.region }}",
+            "source": "={{ $json.source }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "subscriber_id",
+              "displayName": "subscriber_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "platform_id",
+              "displayName": "platform_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "region",
+              "displayName": "region",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "year",
+              "displayName": "year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "quarter",
+              "displayName": "quarter",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subscribers_m",
+              "displayName": "subscribers_m",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "loaded_at",
+              "displayName": "loaded_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        832,
+        0
+      ],
+      "id": "b5472263-768a-41b9-b691-76e0fc75c4dd",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "nwvjfKknAZmZLMDg",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start Pipeline": {
+      "main": [
+        [
+          {
+            "node": "clean and transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Clean and Transform1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "clean and transform": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean and Transform1": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "97356aff-058b-447c-a69d-32613cf0835b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b89b0333569def8e11d968f424c874d5ba41de1b6009ae52fb9e93e3a672a096"
+  },
+  "id": "y3yiJWy0aI2lo5Ls",
+  "tags": []
+}
