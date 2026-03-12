@@ -28,10 +28,6 @@ Excel (raw data) → n8n (ETL) → PostgreSQL (storage) → Quadratic (analysis)
 - MEA shows highest YoY growth rate despite lowest absolute subscribers
 
 
-## Dashboard
-[View live Power BI Dashboard →](YOUR_PUBLISHED_URL_HERE)
-
-
 ## Data Sources
 - Netflix, Disney+, Amazon investor relations reports (public)
 - World Bank internet penetration indicator (IT.NET.USER.ZS)
